@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "../include/menu.h"
 #include "../include/vetor.h"
+#include "../include/benchmark.h"
 
 // Exibe o cat�logo de algoritmos
 void visualizarAlgoritmos(void) {
@@ -234,7 +235,7 @@ void exibirMenu(void) {
 
         switch (opcao) {
             case 1:
-                printf("\nFuncionalidade em desenvolvimento.\n");
+                Benchmark();
                 break;
 
             case 2:
