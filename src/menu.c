@@ -225,9 +225,8 @@ void exibirMenu(void) {
         printf("========================================\n");
 
         printf("1 - Executar benchmark\n");
-        printf("2 - Consultar resultados\n");
-        printf("3 - Visualizar algoritmos\n");
-        printf("4 - Configuracoes do experimento\n");
+        printf("2 - Visualizar algoritmos\n");
+        printf("3 - Configuracoes do experimento\n");
         printf("0 - Sair\n");
 
         printf("\nEscolha uma opcao: ");
@@ -239,14 +238,10 @@ void exibirMenu(void) {
                 break;
 
             case 2:
-                printf("\nFuncionalidade em desenvolvimento.\n");
-                break;
-
-            case 3:
                 visualizarAlgoritmos();
                 break;
 
-            case 4:
+            case 3:
                 gerarVetores();
                 break;
 
