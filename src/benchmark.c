@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,6 +9,7 @@
 #include "../include/selectionSort.h"
 #include "../include/insertionSort.h"
 #include "../include/countingSort.h"
+#include "../include/heapSort.h"
 #include "../include/mergeSort.h"
 #include "../include/quickSort.h"
 #include "../include/bucketSort.h"
@@ -46,12 +46,13 @@ void Benchmark(void) {
     printf("                                      COMPARACAO DE ALGORITMOS\n");
     printf("================================================================================================================\n");
 
-    printf("%-12s %-15s %-15s %-15s %-15s %-15s %-15s %-15s\n",
+    printf("%-12s %-15s %-15s %-15s %-15s %-15s %-15s %-15s %-15s\n",
            "Elementos",
            "Bubble (ms)",
            "Selection (ms)",
            "Insertion (ms)",
            "Counting (ms)",
+           "Heap (ms)",
            "Merge (ms)",
            "Quick (ms)",
            "Bucket (ms)");
@@ -67,18 +68,22 @@ void Benchmark(void) {
             continue;
         }
 
+        // Alocacao dos vetores
         int *vetorBubble = malloc(tamanho * sizeof(int));
         int *vetorSelection = malloc(tamanho * sizeof(int));
         int *vetorInsertion = malloc(tamanho * sizeof(int));
         int *vetorCounting = malloc(tamanho * sizeof(int));
+        int *vetorHeap = malloc(tamanho * sizeof(int));
         int *vetorMerge = malloc(tamanho * sizeof(int));
         int *vetorQuick = malloc(tamanho * sizeof(int));
         int *vetorBucket = malloc(tamanho * sizeof(int));
 
+        // Verificacao de alocacao
         if (vetorBubble == NULL ||
             vetorSelection == NULL ||
             vetorInsertion == NULL ||
             vetorCounting == NULL ||
+            vetorHeap == NULL ||
             vetorMerge == NULL ||
             vetorQuick == NULL ||
             vetorBucket == NULL) {
@@ -90,6 +95,7 @@ void Benchmark(void) {
             free(vetorSelection);
             free(vetorInsertion);
             free(vetorCounting);
+            free(vetorHeap);
             free(vetorMerge);
             free(vetorQuick);
             free(vetorBucket);
@@ -102,6 +108,7 @@ void Benchmark(void) {
         memcpy(vetorSelection, original, tamanho * sizeof(int));
         memcpy(vetorInsertion, original, tamanho * sizeof(int));
         memcpy(vetorCounting, original, tamanho * sizeof(int));
+        memcpy(vetorHeap, original, tamanho * sizeof(int));
         memcpy(vetorMerge, original, tamanho * sizeof(int));
         memcpy(vetorQuick, original, tamanho * sizeof(int));
         memcpy(vetorBucket, original, tamanho * sizeof(int));
@@ -109,7 +116,8 @@ void Benchmark(void) {
         clock_t inicio, fim;
 
         double tempoBubble, tempoSelection, tempoInsertion;
-        double tempoCounting, tempoMerge, tempoQuick, tempoBucket;
+        double tempoCounting, tempoHeap, tempoMerge;
+        double tempoQuick, tempoBucket;
 
         // Bubble Sort
         inicio = clock();
@@ -147,6 +155,15 @@ void Benchmark(void) {
 
         tempoCounting = ((double)(fim - inicio) / CLOCKS_PER_SEC) * 1000.0;
 
+        // Heap Sort
+        inicio = clock();
+
+        heapSort(vetorHeap, tamanho);
+
+        fim = clock();
+
+        tempoHeap = ((double)(fim - inicio) / CLOCKS_PER_SEC) * 1000.0;
+
         // Merge Sort
         inicio = clock();
 
@@ -179,32 +196,39 @@ void Benchmark(void) {
         int selectionCorreto = vetorOrdenado(vetorSelection, tamanho);
         int insertionCorreto = vetorOrdenado(vetorInsertion, tamanho);
         int countingCorreto = vetorOrdenado(vetorCounting, tamanho);
+        int heapCorreto = vetorOrdenado(vetorHeap, tamanho);
         int mergeCorreto = vetorOrdenado(vetorMerge, tamanho);
         int quickCorreto = vetorOrdenado(vetorQuick, tamanho);
         int bucketCorreto = vetorOrdenado(vetorBucket, tamanho);
 
-        printf("%-12d %-15.3f %-15.3f %-15.3f %-15.3f %-15.3f %-15.3f %-15.3f\n",
+        // Exibe os resultados
+        printf("%-12d %-15.3f %-15.3f %-15.3f %-15.3f %-15.3f %-15.3f %-15.3f %-15.3f\n",
                tamanho,
                tempoBubble,
                tempoSelection,
                tempoInsertion,
                tempoCounting,
+               tempoHeap,
                tempoMerge,
                tempoQuick,
                tempoBucket);
 
+        // Verifica erros
         if (!bubbleCorreto || !selectionCorreto ||
             !insertionCorreto || !countingCorreto ||
-            !mergeCorreto || !quickCorreto || !bucketCorreto) {
+            !heapCorreto || !mergeCorreto ||
+            !quickCorreto || !bucketCorreto) {
 
             printf("ERRO: Algoritmo apresentou resultado incorreto!\n");
         }
 
+        // Libera memoria
         free(original);
         free(vetorBubble);
         free(vetorSelection);
         free(vetorInsertion);
         free(vetorCounting);
+        free(vetorHeap);
         free(vetorMerge);
         free(vetorQuick);
         free(vetorBucket);
