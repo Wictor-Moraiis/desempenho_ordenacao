@@ -13,6 +13,7 @@
 #include "../include/mergeSort.h"
 #include "../include/quickSort.h"
 #include "../include/bucketSort.h"
+#include "../include/radixSort.h"
 
 #define QUANTIDADE_TESTES 6
 
@@ -46,7 +47,7 @@ void Benchmark(void) {
     printf("                                      COMPARACAO DE ALGORITMOS\n");
     printf("================================================================================================================\n");
 
-    printf("%-12s %-15s %-15s %-15s %-15s %-15s %-15s %-15s %-15s\n",
+    printf("%-12s %-15s %-15s %-15s %-15s %-15s %-15s %-15s %-15s %-15s\n",
            "Elementos",
            "Bubble (ms)",
            "Selection (ms)",
@@ -55,7 +56,8 @@ void Benchmark(void) {
            "Heap (ms)",
            "Merge (ms)",
            "Quick (ms)",
-           "Bucket (ms)");
+           "Bucket (ms)",
+           "Radix (ms)");
 
     for (int i = 0; i < QUANTIDADE_TESTES; i++) {
 
@@ -77,6 +79,7 @@ void Benchmark(void) {
         int *vetorMerge = malloc(tamanho * sizeof(int));
         int *vetorQuick = malloc(tamanho * sizeof(int));
         int *vetorBucket = malloc(tamanho * sizeof(int));
+        int *vetorRadix = malloc(tamanho * sizeof(int));
 
         // Verificacao de alocacao
         if (vetorBubble == NULL ||
@@ -86,7 +89,8 @@ void Benchmark(void) {
             vetorHeap == NULL ||
             vetorMerge == NULL ||
             vetorQuick == NULL ||
-            vetorBucket == NULL) {
+            vetorBucket == NULL ||
+            vetorRadix == NULL) {
 
             printf("Erro ao alocar memoria!\n");
 
@@ -99,6 +103,7 @@ void Benchmark(void) {
             free(vetorMerge);
             free(vetorQuick);
             free(vetorBucket);
+            free(vetorRadix);
 
             continue;
         }
@@ -112,12 +117,13 @@ void Benchmark(void) {
         memcpy(vetorMerge, original, tamanho * sizeof(int));
         memcpy(vetorQuick, original, tamanho * sizeof(int));
         memcpy(vetorBucket, original, tamanho * sizeof(int));
+        memcpy(vetorRadix, original, tamanho * sizeof(int));
 
         clock_t inicio, fim;
 
         double tempoBubble, tempoSelection, tempoInsertion;
         double tempoCounting, tempoHeap, tempoMerge;
-        double tempoQuick, tempoBucket;
+        double tempoQuick, tempoBucket, tempoRadix;
 
         // Bubble Sort
         inicio = clock();
@@ -191,6 +197,15 @@ void Benchmark(void) {
 
         tempoBucket = ((double)(fim - inicio) / CLOCKS_PER_SEC) * 1000.0;
 
+        // Radix Sort
+        inicio = clock();
+
+        radixSort(vetorRadix, tamanho);
+
+        fim = clock();
+
+        tempoRadix = ((double)(fim - inicio) / CLOCKS_PER_SEC) * 1000.0;
+
         // Verifica se os vetores foram ordenados corretamente
         int bubbleCorreto = vetorOrdenado(vetorBubble, tamanho);
         int selectionCorreto = vetorOrdenado(vetorSelection, tamanho);
@@ -200,9 +215,10 @@ void Benchmark(void) {
         int mergeCorreto = vetorOrdenado(vetorMerge, tamanho);
         int quickCorreto = vetorOrdenado(vetorQuick, tamanho);
         int bucketCorreto = vetorOrdenado(vetorBucket, tamanho);
+        int radixCorreto = vetorOrdenado(vetorRadix, tamanho);
 
         // Exibe os resultados
-        printf("%-12d %-15.3f %-15.3f %-15.3f %-15.3f %-15.3f %-15.3f %-15.3f %-15.3f\n",
+        printf("%-12d %-15.3f %-15.3f %-15.3f %-15.3f %-15.3f %-15.3f %-15.3f %-15.3f %-15.3f\n",
                tamanho,
                tempoBubble,
                tempoSelection,
@@ -211,13 +227,15 @@ void Benchmark(void) {
                tempoHeap,
                tempoMerge,
                tempoQuick,
-               tempoBucket);
+               tempoBucket,
+               tempoRadix);
 
         // Verifica erros
         if (!bubbleCorreto || !selectionCorreto ||
             !insertionCorreto || !countingCorreto ||
             !heapCorreto || !mergeCorreto ||
-            !quickCorreto || !bucketCorreto) {
+            !quickCorreto || !bucketCorreto ||
+            !radixCorreto) {
 
             printf("ERRO: Algoritmo apresentou resultado incorreto!\n");
         }
@@ -232,6 +250,7 @@ void Benchmark(void) {
         free(vetorMerge);
         free(vetorQuick);
         free(vetorBucket);
+        free(vetorRadix);
     }
 
     printf("================================================================================================================\n");
