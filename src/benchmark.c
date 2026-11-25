@@ -8,6 +8,7 @@
 #include "../include/vetor.h"
 #include "../include/bubbleSort.h"
 #include "../include/selectionSort.h"
+#include "../include/insertionSort.h"
 
 #define QUANTIDADE_TESTES 6
 
@@ -37,12 +38,15 @@ void Benchmark(void) {
         100, 1000, 5000, 10000, 50000, 100000
     };
 
-    printf("\n===============================================\n");
-    printf("          COMPARACAO DE ALGORITMOS\n");
-    printf("===============================================\n");
+    printf("\n===============================================================\n");
+    printf("                 COMPARACAO DE ALGORITMOS\n");
+    printf("===============================================================\n");
 
-    printf("%-12s %-18s %-18s\n",
-           "Elementos", "Bubble Sort (ms)", "Selection Sort (ms)");
+    printf("%-12s %-18s %-18s %-18s\n",
+           "Elementos",
+           "Bubble Sort (ms)",
+           "Selection Sort (ms)",
+           "Insertion Sort (ms)");
 
     for (int i = 0; i < QUANTIDADE_TESTES; i++) {
 
@@ -57,24 +61,30 @@ void Benchmark(void) {
 
         int *vetorBubble = malloc(tamanho * sizeof(int));
         int *vetorSelection = malloc(tamanho * sizeof(int));
+        int *vetorInsertion = malloc(tamanho * sizeof(int));
 
-        if (vetorBubble == NULL || vetorSelection == NULL) {
+        if (vetorBubble == NULL ||
+            vetorSelection == NULL ||
+            vetorInsertion == NULL) {
 
             printf("Erro ao alocar memoria!\n");
 
             free(original);
             free(vetorBubble);
             free(vetorSelection);
+            free(vetorInsertion);
 
             continue;
         }
 
-        // Copia o mesmo vetor para os dois algoritmos
+        // Copia o mesmo vetor original para os tres algoritmos
         memcpy(vetorBubble, original, tamanho * sizeof(int));
         memcpy(vetorSelection, original, tamanho * sizeof(int));
+        memcpy(vetorInsertion, original, tamanho * sizeof(int));
 
         clock_t inicio, fim;
-        double tempoBubble, tempoSelection;
+
+        double tempoBubble, tempoSelection, tempoInsertion;
 
         // Bubble Sort
         inicio = clock();
@@ -94,21 +104,35 @@ void Benchmark(void) {
 
         tempoSelection = ((double)(fim - inicio) / CLOCKS_PER_SEC) * 1000.0;
 
+        // Insertion Sort
+        inicio = clock();
+
+        insertionSort(vetorInsertion, tamanho);
+
+        fim = clock();
+
+        tempoInsertion = ((double)(fim - inicio) / CLOCKS_PER_SEC) * 1000.0;
+
         // Verifica se os vetores foram ordenados corretamente
         int bubbleCorreto = vetorOrdenado(vetorBubble, tamanho);
         int selectionCorreto = vetorOrdenado(vetorSelection, tamanho);
+        int insertionCorreto = vetorOrdenado(vetorInsertion, tamanho);
 
-        printf("%-12d %-18.3f %-18.3f\n",
-               tamanho, tempoBubble, tempoSelection);
+        printf("%-12d %-18.3f %-18.3f %-18.3f\n",
+               tamanho,
+               tempoBubble,
+               tempoSelection,
+               tempoInsertion);
 
-        if (!bubbleCorreto || !selectionCorreto) {
+        if (!bubbleCorreto || !selectionCorreto || !insertionCorreto) {
             printf("ERRO: Algoritmo apresentou resultado incorreto!\n");
         }
 
         free(original);
         free(vetorBubble);
         free(vetorSelection);
+        free(vetorInsertion);
     }
 
-    printf("===============================================\n");
+    printf("===============================================================\n");
 }
