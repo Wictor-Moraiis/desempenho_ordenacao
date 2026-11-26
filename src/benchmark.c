@@ -17,10 +17,16 @@
 
 #define QUANTIDADE_TESTES 6
 
-int vetorOrdenado(int vetor[], int tamanho) {
+int compararInteiros(const void *a, const void *b) {
+    int valorA = *(const int *)a;
+    int valorB = *(const int *)b;
 
-    for (int i = 0; i < tamanho - 1; i++) {
-        if (vetor[i] > vetor[i + 1]) {
+    return (valorA > valorB) - (valorA < valorB);
+}
+
+int vetoresIguais(int vetorA[], int vetorB[], int tamanho) {
+    for (int i = 0; i < tamanho; i++) {
+        if (vetorA[i] != vetorB[i]) {
             return 0;
         }
     }
@@ -29,7 +35,6 @@ int vetorOrdenado(int vetor[], int tamanho) {
 }
 
 void Benchmark(void) {
-
     char arquivos[QUANTIDADE_TESTES][20] = {
         "vetor_1.txt",
         "vetor_2.txt",
@@ -60,9 +65,7 @@ void Benchmark(void) {
            "Radix (ms)");
 
     for (int i = 0; i < QUANTIDADE_TESTES; i++) {
-
         int tamanho = tamanhos[i];
-
         int *original = carregarVetor(arquivos[i], tamanho);
 
         if (original == NULL) {
@@ -70,7 +73,19 @@ void Benchmark(void) {
             continue;
         }
 
-        // Alocacao dos vetores
+        /* Cria uma referencia ordenada antes de iniciar as medicoes. */
+        int *esperado = malloc(tamanho * sizeof(int));
+
+        if (esperado == NULL) {
+            printf("Erro ao alocar o vetor de referencia!\n");
+            free(original);
+            continue;
+        }
+
+        memcpy(esperado, original, tamanho * sizeof(int));
+        qsort(esperado, tamanho, sizeof(int), compararInteiros);
+
+        /* Alocacao dos vetores utilizados pelos algoritmos. */
         int *vetorBubble = malloc(tamanho * sizeof(int));
         int *vetorSelection = malloc(tamanho * sizeof(int));
         int *vetorInsertion = malloc(tamanho * sizeof(int));
@@ -81,7 +96,6 @@ void Benchmark(void) {
         int *vetorBucket = malloc(tamanho * sizeof(int));
         int *vetorRadix = malloc(tamanho * sizeof(int));
 
-        // Verificacao de alocacao
         if (vetorBubble == NULL ||
             vetorSelection == NULL ||
             vetorInsertion == NULL ||
@@ -92,9 +106,10 @@ void Benchmark(void) {
             vetorBucket == NULL ||
             vetorRadix == NULL) {
 
-            printf("Erro ao alocar memoria!\n");
+            printf("Erro ao alocar memoria para os vetores de teste!\n");
 
             free(original);
+            free(esperado);
             free(vetorBubble);
             free(vetorSelection);
             free(vetorInsertion);
@@ -104,11 +119,10 @@ void Benchmark(void) {
             free(vetorQuick);
             free(vetorBucket);
             free(vetorRadix);
-
             continue;
         }
 
-        // Copia o mesmo vetor original para todos os algoritmos
+        /* Todos os algoritmos recebem exatamente a mesma entrada. */
         memcpy(vetorBubble, original, tamanho * sizeof(int));
         memcpy(vetorSelection, original, tamanho * sizeof(int));
         memcpy(vetorInsertion, original, tamanho * sizeof(int));
@@ -120,104 +134,66 @@ void Benchmark(void) {
         memcpy(vetorRadix, original, tamanho * sizeof(int));
 
         clock_t inicio, fim;
-
         double tempoBubble, tempoSelection, tempoInsertion;
         double tempoCounting, tempoHeap, tempoMerge;
         double tempoQuick, tempoBucket, tempoRadix;
 
-        // Bubble Sort
         inicio = clock();
-
         bubbleSort(vetorBubble, tamanho);
-
         fim = clock();
-
         tempoBubble = ((double)(fim - inicio) / CLOCKS_PER_SEC) * 1000.0;
 
-        // Selection Sort
         inicio = clock();
-
         selectionSort(vetorSelection, tamanho);
-
         fim = clock();
-
         tempoSelection = ((double)(fim - inicio) / CLOCKS_PER_SEC) * 1000.0;
 
-        // Insertion Sort
         inicio = clock();
-
         insertionSort(vetorInsertion, tamanho);
-
         fim = clock();
-
         tempoInsertion = ((double)(fim - inicio) / CLOCKS_PER_SEC) * 1000.0;
 
-        // Counting Sort
         inicio = clock();
-
         countingSort(vetorCounting, tamanho);
-
         fim = clock();
-
         tempoCounting = ((double)(fim - inicio) / CLOCKS_PER_SEC) * 1000.0;
 
-        // Heap Sort
         inicio = clock();
-
         heapSort(vetorHeap, tamanho);
-
         fim = clock();
-
         tempoHeap = ((double)(fim - inicio) / CLOCKS_PER_SEC) * 1000.0;
 
-        // Merge Sort
         inicio = clock();
-
         mergeSort(vetorMerge, tamanho);
-
         fim = clock();
-
         tempoMerge = ((double)(fim - inicio) / CLOCKS_PER_SEC) * 1000.0;
 
-        // Quick Sort
         inicio = clock();
-
         quickSort(vetorQuick, tamanho);
-
         fim = clock();
-
         tempoQuick = ((double)(fim - inicio) / CLOCKS_PER_SEC) * 1000.0;
 
-        // Bucket Sort
         inicio = clock();
-
         bucketSort(vetorBucket, tamanho);
-
         fim = clock();
-
         tempoBucket = ((double)(fim - inicio) / CLOCKS_PER_SEC) * 1000.0;
 
-        // Radix Sort
         inicio = clock();
-
         radixSort(vetorRadix, tamanho);
-
         fim = clock();
-
         tempoRadix = ((double)(fim - inicio) / CLOCKS_PER_SEC) * 1000.0;
 
-        // Verifica se os vetores foram ordenados corretamente
-        int bubbleCorreto = vetorOrdenado(vetorBubble, tamanho);
-        int selectionCorreto = vetorOrdenado(vetorSelection, tamanho);
-        int insertionCorreto = vetorOrdenado(vetorInsertion, tamanho);
-        int countingCorreto = vetorOrdenado(vetorCounting, tamanho);
-        int heapCorreto = vetorOrdenado(vetorHeap, tamanho);
-        int mergeCorreto = vetorOrdenado(vetorMerge, tamanho);
-        int quickCorreto = vetorOrdenado(vetorQuick, tamanho);
-        int bucketCorreto = vetorOrdenado(vetorBucket, tamanho);
-        int radixCorreto = vetorOrdenado(vetorRadix, tamanho);
+        /* A validacao acontece depois das medicoes, fora do cronometro. */
+        int bubbleCorreto = vetoresIguais(vetorBubble, esperado, tamanho);
+        int selectionCorreto = vetoresIguais(vetorSelection, esperado, tamanho);
+        int insertionCorreto = vetoresIguais(vetorInsertion, esperado, tamanho);
+        int countingCorreto = vetoresIguais(vetorCounting, esperado, tamanho);
+        int heapCorreto = vetoresIguais(vetorHeap, esperado, tamanho);
+        int mergeCorreto = vetoresIguais(vetorMerge, esperado, tamanho);
+        int quickCorreto = vetoresIguais(vetorQuick, esperado, tamanho);
+        int bucketCorreto = vetoresIguais(vetorBucket, esperado, tamanho);
+        int radixCorreto = vetoresIguais(vetorRadix, esperado, tamanho);
 
-        // Exibe os resultados
         printf("%-12d %-15.3f %-15.3f %-15.3f %-15.3f %-15.3f %-15.3f %-15.3f %-15.3f %-15.3f\n",
                tamanho,
                tempoBubble,
@@ -230,18 +206,19 @@ void Benchmark(void) {
                tempoBucket,
                tempoRadix);
 
-        // Verifica erros
-        if (!bubbleCorreto || !selectionCorreto ||
-            !insertionCorreto || !countingCorreto ||
-            !heapCorreto || !mergeCorreto ||
-            !quickCorreto || !bucketCorreto ||
-            !radixCorreto) {
+        printf("Validacao: Bubble %s | Selection %s | Insertion %s | Counting %s | Heap %s | Merge %s | Quick %s | Bucket %s | Radix %s\n",
+               bubbleCorreto ? "OK" : "ERRO",
+               selectionCorreto ? "OK" : "ERRO",
+               insertionCorreto ? "OK" : "ERRO",
+               countingCorreto ? "OK" : "ERRO",
+               heapCorreto ? "OK" : "ERRO",
+               mergeCorreto ? "OK" : "ERRO",
+               quickCorreto ? "OK" : "ERRO",
+               bucketCorreto ? "OK" : "ERRO",
+               radixCorreto ? "OK" : "ERRO");
 
-            printf("ERRO: Algoritmo apresentou resultado incorreto!\n");
-        }
-
-        // Libera memoria
         free(original);
+        free(esperado);
         free(vetorBubble);
         free(vetorSelection);
         free(vetorInsertion);
