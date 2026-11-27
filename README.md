@@ -1,3 +1,4 @@
+
 # Analise comparativa de algoritmos de ordenacao
 
 Projeto em C que implementa e compara nove algoritmos de ordenacao: Bubble, Selection, Insertion, Merge, Quick, Heap, Counting, Radix e Bucket Sort.
@@ -25,7 +26,15 @@ Para remover o executavel:
 make clean
 ```
 
-O arquivo `Makefile` compila todos os arquivos `.c` localizados em `src/` e utiliza os cabecalhos de `include/`.
+## Compilacao no Windows
+
+No Windows, utilizando MinGW/GCC e GNU Make, execute:
+
+```bash
+make -f Makefile.win
+```
+
+O comando gera o executavel `desempenho_ordenacao.exe`.
 
 ## Validacao dos resultados
 
@@ -39,4 +48,4 @@ Os arquivos `vetor_1.txt` ate `vetor_6.txt` ficam na pasta principal. A opcao 3 
 
 ## Ambiente e opcoes de compilacao
 
-O `Makefile` nao define uma opcao `-O0`, `-O1`, `-O2` ou `-O3`; portanto, o compilador utiliza seu nivel padrao de otimizacao. Para reproduzir os tempos, registre a versao do compilador e mantenha as mesmas opcoes em todas as execucoes.
+No macOS, o projeto utiliza Apple Clang com as opcoes `-std=c11 -Wall -Wextra -Iinclude`. O Makefile nao define um nivel explicito de otimizacao (`-O0`, `-O1`, `-O2` ou `-O3`), portanto, o compilador utiliza seu nivel padrao. Para reproduzir os tempos, registre a versao do compilador e mantenha as mesmas opcoes em todas as execucoes.
